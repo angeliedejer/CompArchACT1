@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel World Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* CSS for the pixelated theme and layout */
+        :root {
+            --pixel-size: 2px;
+            --main-bg: #87CEEB; /* Sky blue */
+            --ground-color: #6B8E23; /* Olive green */
+            --mountain-color: #708090; /* Slate gray */
+            --cloud-color: #f0f8ff; /* Alice blue */
+            --text-color: #ffffff;
+            --border-color: #000000;
+            --button-color: #1a1a1a;
+            --button-text-color: #fff;
+            --button-shadow-color: #000;
+            --border-width: 4px;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(
+                to bottom,
+                var(--main-bg) 0%,
+                var(--main-bg) 70%,
+                var(--ground-color) 70%,
+                var(--ground-color) 100%
+            );
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            image-rendering: pixelated;
+            overflow-x: hidden; /* Only hide horizontal overflow */
+        }
+        
+        /* Pixelated clouds animation */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: -100%; /* Start off-screen to the left */
+            width: 300%; /* Make it wide enough to cover the entire animation path */
+            height: 20%;
+            background: 
+                radial-gradient(ellipse at 50% 50%, var(--cloud-color) 40%, transparent 40%) 20% 50% / 10% 20% no-repeat,
+                radial-gradient(ellipse at 50% 50%, var(--cloud-color) 40%, transparent 40%) 70% 30% / 12% 25% no-repeat,
+                radial-gradient(ellipse at 50% 50%, var(--cloud-color) 40%, transparent 40%) 50% 80% / 15% 30% no-repeat;
+            animation: moveClouds 20s linear infinite;
+        }
+
+        @keyframes moveClouds {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(100%);
+            }
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 0; /* Pixel art style */
+            padding: 2rem;
+            max-width: 900px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 8px 8px 0px var(--button-shadow-color);
+            position: relative;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            text-shadow: 4px 4px 0px var(--button-shadow-color);
+            letter-spacing: 0.1em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .menu-button {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 0;
+            padding: 12px 24px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px var(--button-shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .menu-button:hover {
+            box-shadow: 6px 6px 0px var(--button-shadow-color);
+            transform: translate(-2px, -2px);
+        }
+
+        .menu-button:active {
+            box-shadow: 2px 2px 0px var(--button-shadow-color);
+            transform: translate(2px, 2px);
+        }
+
+        .exit-button {
+            background-color: #FF0000; /* Bright red for exit button */
+            color: #FFFFFF;
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 0;
+            padding: 12px 24px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #800000; /* Darker red shadow */
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .exit-button:hover {
+            box-shadow: 6px 6px 0px #800000;
+            transform: translate(-2px, -2px);
+        }
+
+        .exit-button:active {
+            box-shadow: 2px 2px 0px #800000;
+            transform: translate(2px, 2px);
+        }
+
+        .content {
+            border: var(--border-width) solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            text-align: left;
+            min-height: 250px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            font-family: 'Press Start 2P', cursive;
+            width: calc(100% - 20px);
+            padding: 8px 10px;
+            background-color: #2b2b2b;
+            color: #fff;
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 0;
+            box-shadow: inset 2px 2px 0px var(--button-shadow-color);
+        }
+
+        .submit-button {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #008000; /* Green */
+            color: var(--button-text-color);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 0;
+            padding: 10px 20px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            font-size: 0.8rem;
+        }
+        
+        .submit-button:hover {
+             box-shadow: 6px 6px 0px #000;
+            transform: translate(-2px, -2px);
+        }
+
+        .submit-button:active {
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+        }
+
+        .output-box {
+            margin-top: 1.5rem;
+            background-color: #1a1a1a;
+            border: var(--border-width) solid var(--border-color);
+            padding: 1rem;
+            white-space: pre-wrap;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* Exit Animation Styles */
+        #exit-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        #exit-screen.show {
+            display: flex;
+            opacity: 1;
+        }
+        
+        #goodbye-message {
+            font-size: 2rem;
+            color: #ff00ff; /* Pink/purple */
+            text-shadow: 4px 4px 0px #000;
+            animation: goodbye-pop 1s ease-out;
+        }
+
+        @keyframes goodbye-pop {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .menu {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .menu-button {
+                width: 100%;
+                font-size: 0.7rem;
+            }
+            .container {
+                padding: 1rem;
+            }
+            .title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="title">PixelCalc 3000</h1>
+    <nav class="menu">
+        <button class="menu-button" onclick="showOption('convert-decimal')">1. Dec to Binary/Octal/Hex</button>
+        <button class="menu-button" onclick="showOption('convert-to-decimal')">2. Binary/Octal/Hex to Dec</button>
+        <button class="menu-button" onclick="showOption('add-numbers')">3. Add two numbers</button>
+        <button class="menu-button" onclick="showOption('encode-message')">4. Encode Secret Message</button>
+        <button class="menu-button" onclick="showOption('decode-message')">5. Decode Secret Message</button>
+        <button class="exit-button" onclick="exitProgram()">Exit</button>
+    </nav>
+    <div id="content" class="content">
+        <p>Choose an option from the menu above to get started!</p>
+    </div>
+</div>
+
+<div id="exit-screen">
+    <div id="goodbye-message">Goodbye, and stay pixelated!</div>
+</div>
+
+<script>
+    // Constants for sound generation
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const soundData = {
+        'click': { frequency: 440, duration: 0.05, type: 'square' },
+        'success': { frequency: 880, duration: 0.1, type: 'triangle' },
+        'exit': { frequency: 220, duration: 0.5, type: 'sine' }
+    };
+
+    /**
+     * Plays a simple synthesized audio tone.
+     * @param {string} soundName - The name of the sound to play from the soundData object.
+     */
+    function playAudio(soundName) {
+        const sound = soundData[soundName];
+        if (!sound) return;
+
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.type = sound.type;
+        oscillator.frequency.setValueAtTime(sound.frequency, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + sound.duration);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + sound.duration);
+    }
+    
+    /**
+     * Plays a short "gamer" jingle.
+     */
+    function playExitJingle() {
+        const jingleNotes = [
+            { frequency: 523.25, duration: 0.1 }, // C5
+            { frequency: 659.25, duration: 0.1 }, // E5
+            { frequency: 783.99, duration: 0.2 }, // G5
+            { frequency: 1046.50, duration: 0.3 } // C6
+        ];
+
+        let timeOffset = 0;
+        jingleNotes.forEach(note => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(note.frequency, audioContext.currentTime + timeOffset);
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime + timeOffset);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + timeOffset + note.duration);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start(audioContext.currentTime + timeOffset);
+            oscillator.stop(audioContext.currentTime + timeOffset + note.duration + 0.05);
+
+            timeOffset += note.duration;
+        });
+    }
+
+    const contentDiv = document.getElementById('content');
+
+    /**
+     * Clears the content area and displays the requested form.
+     * @param {string} option - The ID of the form to display.
+     */
+    function showOption(option) {
+        playAudio('click');
+        contentDiv.innerHTML = ''; // Clear previous content
+
+        switch (option) {
+            case 'convert-decimal':
+                contentDiv.innerHTML = `
+                    <h3>Convert Decimal to All</h3>
+                    <div class="form-group">
+                        <label for="dec-input">Enter decimal number:</label>
+                        <input type="number" id="dec-input" placeholder="e.g., 2025" required>
+                    </div>
+                    <button class="submit-button" onclick="convertDecimal()">Convert</button>
+                    <div id="output-dec" class="output-box"></div>
+                `;
+                break;
+            case 'convert-to-decimal':
+                contentDiv.innerHTML = `
+                    <h3>Convert to Decimal</h3>
+                    <div class="form-group">
+                        <label for="base-input">Enter its base (2, 8, or 16):</label>
+                        <input type="number" id="base-input" min="2" max="16" placeholder="e.g., 2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="num-input">Enter number:</label>
+                        <input type="text" id="num-input" placeholder="e.g., 11111101001" required>
+                    </div>
+                    <button class="submit-button" onclick="convertToDecimal()">Convert</button>
+                    <div id="output-to-dec" class="output-box"></div>
+                `;
+                break;
+            case 'add-numbers':
+                contentDiv.innerHTML = `
+                    <h3>Add Two Numbers</h3>
+                    <div class="form-group">
+                        <label for="num1-input">Enter first number:</label>
+                        <input type="text" id="num1-input" placeholder="e.g., 101101" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="base1-input">Enter its base (2, 8, 10, or 16):</label>
+                        <input type="number" id="base1-input" min="2" max="16" placeholder="e.g., 2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="num2-input">Enter second number:</label>
+                        <input type="text" id="num2-input" placeholder="e.g., 2F" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="base2-input">Enter its base (2, 8, 10, or 16):</label>
+                        <input type="number" id="base2-input" min="2" max="16" placeholder="e.g., 16" required>
+                    </div>
+                    <button class="submit-button" onclick="addNumbers()">Add</button>
+                    <div id="output-add" class="output-box"></div>
+                `;
+                break;
+            case 'encode-message':
+                contentDiv.innerHTML = `
+                    <h3>Encode Secret Message</h3>
+                    <div class="form-group">
+                        <label for="msg-input">Enter message:</label>
+                        <input type="text" id="msg-input" placeholder="e.g., HELLO" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="key-input">Enter secret key (decimal):</label>
+                        <input type="number" id="key-input" placeholder="e.g., 5" required>
+                    </div>
+                    <button class="submit-button" onclick="encodeMessage()">Encode</button>
+                    <div id="output-encode" class="output-box"></div>
+                `;
+                break;
+            case 'decode-message':
+                contentDiv.innerHTML = `
+                    <h3>Decode Secret Message</h3>
+                    <div class="form-group">
+                        <label for="encoded-input">Enter encoded decimal values (comma-separated):</label>
+                        <input type="text" id="encoded-input" placeholder="e.g., [77, 74, 81, 81, 84]" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="decode-key-input">Enter secret key (decimal):</label>
+                        <input type="number" id="decode-key-input" placeholder="e.g., 5" required>
+                    </div>
+                    <button class="submit-button" onclick="decodeMessage()">Decode</button>
+                    <div id="output-decode" class="output-box"></div>
+                `;
+                break;
+        }
+    }
+
+    /**
+     * Handles the decimal to other bases conversion logic.
+     */
+    function convertDecimal() {
+        playAudio('success');
+        const decInput = document.getElementById('dec-input').value;
+        const outputDiv = document.getElementById('output-dec');
+
+        try {
+            const decNum = parseInt(decInput, 10);
+            if (isNaN(decNum)) throw new Error('Invalid decimal number.');
+
+            const binary = decNum.toString(2);
+            const octal = decNum.toString(8);
+            const hex = decNum.toString(16).toUpperCase();
+
+            outputDiv.innerHTML = `
+                <p><strong>Decimal:</strong> ${decNum}</p>
+                <p><strong>Binary:</strong> ${binary}</p>
+                <p><strong>Octal:</strong> ${octal}</p>
+                <p><strong>Hex:</strong> ${hex}</p>
+            `;
+        } catch (e) {
+            outputDiv.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+        }
+    }
+    
+    /**
+     * Converts a number from a given base to decimal.
+     */
+    function convertToDecimal() {
+        playAudio('success');
+        const numInput = document.getElementById('num-input').value;
+        const baseInput = document.getElementById('base-input').value;
+        const outputDiv = document.getElementById('output-to-dec');
+
+        try {
+            const base = parseInt(baseInput, 10);
+            const decNum = parseInt(numInput, base);
+
+            if (isNaN(decNum) || (base !== 2 && base !== 8 && base !== 16)) {
+                throw new Error('Invalid number or base. Please check your input.');
+            }
+
+            outputDiv.innerHTML = `<p><strong>Decimal:</strong> ${decNum}</p>`;
+
+        } catch (e) {
+            outputDiv.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+        }
+    }
+
+    /**
+     * Adds two numbers of different bases and displays the result.
+     */
+    function addNumbers() {
+        playAudio('success');
+        const num1Input = document.getElementById('num1-input').value;
+        const base1Input = document.getElementById('base1-input').value;
+        const num2Input = document.getElementById('num2-input').value;
+        const base2Input = document.getElementById('base2-input').value;
+        const outputDiv = document.getElementById('output-add');
+
+        try {
+            const dec1 = parseInt(num1Input, parseInt(base1Input, 10));
+            const dec2 = parseInt(num2Input, parseInt(base2Input, 10));
+            
+            if (isNaN(dec1) || isNaN(dec2)) {
+                throw new Error('Invalid numbers or bases. Please check your input.');
+            }
+
+            const sum = dec1 + dec2;
+            const binarySum = sum.toString(2);
+            const octalSum = sum.toString(8);
+            const hexSum = sum.toString(16).toUpperCase();
+
+            outputDiv.innerHTML = `
+                <p><strong>Results of Addition:</strong></p>
+                <p><strong>Decimal:</strong> ${sum}</p>
+                <p><strong>Binary:</strong> ${binarySum}</p>
+                <p><strong>Octal:</strong> ${octalSum}</p>
+                <p><strong>Hex:</strong> ${hexSum}</p>
+            `;
+        } catch (e) {
+            outputDiv.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+        }
+    }
+
+    /**
+     * Encodes a message using a shift cipher.
+     */
+    function encodeMessage() {
+        playAudio('success');
+        const msgInput = document.getElementById('msg-input').value;
+        const keyInput = document.getElementById('key-input').value;
+        const outputDiv = document.getElementById('output-encode');
+
+        try {
+            const key = parseInt(keyInput, 10);
+            if (isNaN(key)) throw new Error('Invalid key.');
+
+            const encodedDec = [];
+            const encodedHex = [];
+
+            for (let i = 0; i < msgInput.length; i++) {
+                const charCode = msgInput.charCodeAt(i);
+                const encodedCode = charCode + key;
+                encodedDec.push(encodedCode);
+                encodedHex.push(encodedCode.toString(16).toUpperCase().padStart(2, '0'));
+            }
+
+            outputDiv.innerHTML = `
+                <p><strong>Encoded (decimal values):</strong> [${encodedDec.join(', ')}]</p>
+                <p><strong>Encoded (hex values):</strong> ['${encodedHex.join("', '")}']</p>
+            `;
+        } catch (e) {
+            outputDiv.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+        }
+    }
+
+    /**
+     * Decodes a message using a shift cipher.
+     */
+    function decodeMessage() {
+        playAudio('success');
+        const encodedInput = document.getElementById('encoded-input').value;
+        const keyInput = document.getElementById('decode-key-input').value;
+        const outputDiv = document.getElementById('output-decode');
+
+        try {
+            const key = parseInt(keyInput, 10);
+            if (isNaN(key)) throw new Error('Invalid key.');
+            
+            // Clean the input string to handle optional brackets
+            const cleanInput = encodedInput.trim().replace(/[\[\]\s]/g, '');
+
+            const encodedValues = cleanInput.split(',').map(val => parseInt(val, 10));
+            if (encodedValues.some(isNaN)) throw new Error('Invalid encoded values. Please use comma-separated decimal numbers.');
+            
+            let decodedMessage = '';
+            for (const val of encodedValues) {
+                const originalCode = val - key;
+                decodedMessage += String.fromCharCode(originalCode);
+            }
+
+            outputDiv.innerHTML = `<p><strong>Decoded Message:</strong> ${decodedMessage}</p>`;
+        } catch (e) {
+            outputDiv.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+        }
+    }
+    
+    /**
+     * Triggers the exit animation and message.
+     */
+    function exitProgram() {
+        playExitJingle(); // Play the jingle instead of the simple exit tone
+        const exitScreen = document.getElementById('exit-screen');
+        const container = document.querySelector('.container');
+        
+        container.style.display = 'none'; // Hide the main UI
+        exitScreen.style.display = 'flex'; // Show the exit screen
+        
+        // Use a timeout to trigger the fade-in and animation after display:flex
+        setTimeout(() => {
+            exitScreen.classList.add('show');
+        }, 10);
+    }
+</script>
+
+</body>
+</html>
